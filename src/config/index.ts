@@ -1,3 +1,5 @@
+import environmentVariables from "../../env.json";
+
 export interface IConfig {
   readonly host: string;
   readonly port: number;
@@ -29,4 +31,17 @@ const defaultConfig: IConfig = {
   cleanup_out_msgs: 1000,
 };
 
-export default defaultConfig;
+export interface EnvironmentConfig {
+  THEATER_API_HOST: string;
+  THEATER_API_PORT: number;
+}
+
+const environmentConfig: EnvironmentConfig = {
+  THEATER_API_HOST: environmentVariables.THEATER_API_HOST,
+  THEATER_API_PORT: environmentVariables.THEATER_API_PORT
+}
+
+export {
+  environmentConfig,
+  defaultConfig
+}

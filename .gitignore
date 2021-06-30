@@ -11,8 +11,10 @@ pids
 logs
 results
 
-node_modules
+node_modules/*
 npm-debug.log
+dist/*
+bin/*
 
 .idea
 .cache

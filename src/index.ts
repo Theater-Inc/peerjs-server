@@ -3,7 +3,7 @@ import http from "http";
 import https from "https";
 import { Server } from "net";
 
-import defaultConfig, { IConfig } from "./config";
+import { defaultConfig, IConfig } from "./config";
 import { createInstance } from "./instance";
 
 type Optional<T> = {

@@ -6,6 +6,7 @@ import { IConfig } from "../../config";
 import { Errors, MessageType } from "../../enums";
 import { Client, IClient } from "../../models/client";
 import { IRealm } from "../../models/realm";
+import TheaterAPI from "../TheaterAPI";
 import { MyWebSocket } from "./webSocket";
 
 export interface IWebSocketServer extends EventEmitter {
@@ -16,6 +17,7 @@ interface IAuthParams {
   id?: string;
   token?: string;
   key?: string;
+  sid?: string;
 }
 
 type CustomConfig = Pick<IConfig, 'path' | 'key' | 'concurrent_limit'>;
@@ -46,10 +48,18 @@ export class WebSocketServer extends EventEmitter implements IWebSocketServer {
     this.socketServer.on("error", (error: Error) => this._onSocketError(error));
   }
 
-  private _onSocketConnection(socket: MyWebSocket, req: IncomingMessage): void {
+  private async _onSocketConnection(socket: MyWebSocket, req: IncomingMessage): Promise<void> {
     const { query = {} } = url.parse(req.url ?? '', true);
+    const { sid, id, token, key }: IAuthParams = query;
+    if (!sid) {
+      return this._sendTheaterErrorAndClose(socket, MessageType.THEATER_MISSING_SID, Errors.THEATER_MISSING_SID)
+    }
 
-    const { id, token, key }: IAuthParams = query;
+    const theaterAPI = new TheaterAPI(sid); 
+    const subsciptionIsValid = await theaterAPI.isSubscriptionValid();
+    if (!subsciptionIsValid) {
+      return this._sendTheaterErrorAndClose(socket, MessageType.THEATER_INVALID_SUBSCRIPTION, Errors.THEATER_INVALID_SUBSCRIPTION);
+    }
 
     if (!id || !token || !key) {
       return this._sendErrorAndClose(socket, Errors.INVALID_WS_PARAMETERS);
@@ -134,6 +144,17 @@ export class WebSocketServer extends EventEmitter implements IWebSocketServer {
     socket.send(
       JSON.stringify({
         type: MessageType.ERROR,
+        payload: { msg }
+      })
+    );
+
+    socket.close();
+  }
+
+  private _sendTheaterErrorAndClose(socket: MyWebSocket, type: MessageType, msg: Errors): void {
+    socket.send(
+      JSON.stringify({
+        type: type,
         payload: { msg }
       })
     );

@@ -18,11 +18,11 @@ exports.PeerServer = exports.ExpressPeerServer = void 0;
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const https_1 = __importDefault(require("https"));
-const config_1 = __importDefault(require("./config"));
+const config_1 = require("./config");
 const instance_1 = require("./instance");
 function ExpressPeerServer(server, options) {
     const app = express_1.default();
-    const newOptions = Object.assign(Object.assign({}, config_1.default), options);
+    const newOptions = Object.assign(Object.assign({}, config_1.defaultConfig), options);
     if (newOptions.proxied) {
         app.set("trust proxy", newOptions.proxied === "false" ? false : !!newOptions.proxied);
     }
@@ -38,7 +38,7 @@ function ExpressPeerServer(server, options) {
 exports.ExpressPeerServer = ExpressPeerServer;
 function PeerServer(options = {}, callback) {
     const app = express_1.default();
-    let newOptions = Object.assign(Object.assign({}, config_1.default), options);
+    let newOptions = Object.assign(Object.assign({}, config_1.defaultConfig), options);
     const port = newOptions.port;
     const host = newOptions.host;
     let server;

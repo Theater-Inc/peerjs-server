@@ -10,7 +10,6 @@ export class AuthMiddleware implements IMiddleware {
 
   public handle = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { id, token, key } = req.params;
-
     if (key !== this.config.key) {
       return res.status(401).send(Errors.INVALID_KEY);
     }

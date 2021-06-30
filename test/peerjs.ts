@@ -20,7 +20,6 @@ async function makeRequest() {
       });
 
     }).on("error", err => {
-      console.log("Error: " + err.message);
       reject(err);
     });
   });
